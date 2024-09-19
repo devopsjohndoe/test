@@ -1,0 +1,8 @@
+#!/bin/bash
+sudo killall -9 screen
+cd /opt/moontrader/
+./MTCore &
+#wait 120
+sleep 2m
+sudo kill -9 $(ps -ef | grep "MTCore" | grep -v grep | awk '{print $2}')
+sudo reboot

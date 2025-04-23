@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Colors
+c_green='\033[0;32m'
+c_red='\033[0;31m'
+c_clear='\033[0m'
+
+spinner()
+{
+	local pid=$!
+	local delay=0.75
+	local spinstr='|/-\'
+	while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+		local temp=${spinstr#?}
+		printf " [%c]  " "$spinstr"
+		local spinstr=$temp${spinstr%"$temp"}
+		sleep $delay
+		printf "\b\b\b\b\b\b"
+	done
+	printf "    \b\b\b\b"
+}
+
+
+ARCH=$(uname -p)
+#aarch64
+#x86_64
+
+if [[ $ARCH = "x86_64" ]]; then
+	mt_link="https://cdn3.moontrader.com/beta/linux-x86_64/MoonTrader-linux-x86_64.tar.xz"
+elif [[ $ARCH = "aarch64" ]]; then
+	mt_link="https://cdn3.moontrader.com/beta/linux-arm64/MoonTrader-linux-arm64.tar.xz"
+else
+	echo -e "Arch : $ARCH"
+	mt_link=""
+fi
+
+if [[ -n "$mt_link" ]]; then
+	echo -e "Upgrading...."
+	(cd /opt/moontrader && wget -qO MoonTrader.tar.xz "$mt_link" >/dev/null 2>&1 && tar -xpJf MoonTrader.tar.xz -C /opt/moontrader >/dev/null 2>&1 && rm /opt/moontrader/MoonTrader.tar.xz) &
+	spinner
+	echo -e "${c_green}Upgrade Done!$c_clear"
+else
+	echo -e "${c_red}Upgrade FAIL!!!$c_clear"
+	echo -e "${c_red}Please upgrade manually or contact support$c_clear"
+fi
